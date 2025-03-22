@@ -1,18 +1,21 @@
+
 //=====[Libraries]=============================================================
 
 #include "mbed.h"
 #include "arm_book_lib.h"
+#include "temperature_sensor.h"
+#include "gas_sensor.h"
+#include "user_interface.h"
 
-#include "strobe_light.h"
-#include "smart_home_system.h"
 
 //=====[Declaration of private defines]========================================
+
+//defines heat threshold of 35 celcius(human touch), used for testing purposes 
+#define HEAT_LEVEL     35
 
 //=====[Declaration of private data types]=====================================
 
 //=====[Declaration and initialization of public global objects]===============
-
-DigitalOut strobeLight(LED1);
 
 //=====[Declaration of external public global variables]=======================
 
@@ -20,41 +23,35 @@ DigitalOut strobeLight(LED1);
 
 //=====[Declaration and initialization of private global variables]============
 
-static bool strobeLightState = OFF;
+//variables used to store data throughout the system
+bool emergency = false;
+bool gasDetected = false;
+bool overTemp = false;
 
 //=====[Declarations (prototypes) of private functions]========================
 
+
+
 //=====[Implementations of public functions]===================================
 
-void strobeLightInit()
-{
-    strobeLight = OFF;
+//initializes alarm system outputs
+void alarmSystemInit() {
+gasDetected = false;
+overTemp = false;
+emergency = false; 
 }
 
-bool strobeLightStateRead()
-{
-    return strobeLightState;
-}
+//controls alarm state based on sensor readings
+//emergency variable stores alarm output, to be used in other modules
+void alarmUpdate() {
+    float tempReading = temperatureSensorReadCelsius();
+    gasDetected = gasSensorRead();
 
-void strobeLightStateWrite( bool state )
-{
-    strobeLightState = state;
-}
+    if (tempReading > HEAT_LEVEL || gasDetected) {
+        emergency = true;
 
-void strobeLightUpdate( int strobeTime )
-{
-    static int accumulatedTimeAlarm = 0;
-    accumulatedTimeAlarm = accumulatedTimeAlarm + SYSTEM_TIME_INCREMENT_MS;
-    
-    if( strobeLightState ) {
-        if( accumulatedTimeAlarm >= strobeTime ) {
-            accumulatedTimeAlarm = 0;
-            strobeLight= !strobeLight;
-        }
     } else {
-        strobeLight = OFF;
+        emergency = false;
     }
 }
-
-//=====[Implementations of private functions]==================================
 

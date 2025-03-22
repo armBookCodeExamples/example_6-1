@@ -1,19 +1,19 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _SIREN_H_
-#define _SIREN_H_
+#ifndef _timer_h_
+#define _timer_h_
 
 //=====[Declaration of public defines]=========================================
 
 //=====[Declaration of public data types]======================================
-
+extern int timeRemaining;
 //=====[Declarations (prototypes) of public functions]=========================
-
-void sirenInit();
-bool sirenStateRead();
-void sirenStateWrite( bool state );
-void sirenUpdate( int strobeTime );
+void timerInit();
+void startTimer();
+void timerUpdate();
+bool isTimerDone();
+int getTimeRemaining();
 
 //=====[#include guards - end]=================================================
 
-#endif // _SIREN_H_
+#endif // _timer_h_

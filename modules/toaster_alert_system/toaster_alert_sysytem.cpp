@@ -1,11 +1,12 @@
 //=====[Libraries]=============================================================
 
+#include "gas_sensor.h"
 #include "mbed.h"
 #include "arm_book_lib.h"
-
-#include "siren.h"
-
-#include "smart_home_system.h"
+#include "alarm.h"
+#include "display.h"
+#include "timer.h"
+#include "user_interface.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -13,49 +14,31 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
-DigitalOut sirenPin(PE_10);
-
 //=====[Declaration of external public global variables]=======================
 
 //=====[Declaration and initialization of public global variables]=============
 
 //=====[Declaration and initialization of private global variables]============
 
-static bool sirenState = OFF;
-
 //=====[Declarations (prototypes) of private functions]========================
 
 //=====[Implementations of public functions]===================================
 
-void sirenInit()
-{
-    sirenPin = ON;
+// runs all initializations
+void toasterAlertSystemInit() {
+    InputsInit();
+    outputsInit();
+    gasSensorInit();
+    temperatureSensorInit();
+    timerInit();
+    alarmSystemInit();
 }
 
-bool sirenStateRead()
-{
-    return sirenState;
+// runs all updates
+void toasterAlertSystemUpdate() {
+    gasSensorUpdate();
+    temperatureSensorUpdate();
+    user_InterfaceUpdate();
+    timerUpdate();
+    alarmUpdate(); 
 }
-
-void sirenStateWrite( bool state )
-{
-    sirenState = state;
-}
-
-void sirenUpdate( int strobeTime )
-{
-    static int accumulatedTimeAlarm = 0;
-    accumulatedTimeAlarm = accumulatedTimeAlarm + SYSTEM_TIME_INCREMENT_MS;
-    
-    if( sirenState ) {
-        if( accumulatedTimeAlarm >= strobeTime ) {
-                accumulatedTimeAlarm = 0;
-                sirenPin= !sirenPin;
-        }
-    } else {
-        sirenPin = ON;
-    }
-}
-
-//=====[Implementations of private functions]==================================
-
